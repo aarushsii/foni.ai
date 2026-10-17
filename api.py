@@ -4,6 +4,7 @@ Run locally:   uvicorn api:app --reload --port 8000
 Then open:     http://localhost:8000/docs   (a page where you can test it)
 """
 import json
+from typing import Optional
 import os
 
 from fastapi import FastAPI, HTTPException
@@ -28,8 +29,8 @@ class Scenario(BaseModel):
     known_contact: bool = False
     callback_verified: bool = False
     trusted_contact: str = "Sarah"   # the person Grandma chose to confirm big payments
-    model: str | None = None         # optional: try a different model
-    version: str | None = None       # optional: "v1" or "v2"
+    model: Optional[str] = None         # optional: try a different model
+    version: Optional[str] = None       # optional: "v1" or "v2"
 
 
 class Verification(BaseModel):
@@ -38,7 +39,7 @@ class Verification(BaseModel):
 
 
 # Held payments waiting for the trusted contact (simulated, in memory).
-HOLDS: dict[str, dict] = {}
+HOLDS = {}
 
 
 @app.get("/health")
@@ -75,6 +76,20 @@ def verify(v: Verification):
 def holds():
     """All held payments and their status, for the demo screen."""
     return HOLDS
+
+
+DEMO_IDS = ["c01", "s01", "c26", "s04", "c17", "c44"]   # scams + legit calls for the demo buttons
+
+
+@app.get("/scenarios")
+def scenarios():
+    """Ready-made simulated calls for the demo screen (scam and legit)."""
+    out = []
+    for path in ("scenarios.jsonl", "sample_scenarios.jsonl"):
+        if os.path.exists(path):
+            out += [json.loads(l) for l in open(path) if l.strip()]
+    demo = [s for s in out if s.get("id") in DEMO_IDS]
+    return {"demo": demo or out[:4], "all": out, "simulated": True}
 
 
 @app.get("/scorecard")

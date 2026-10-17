@@ -19,6 +19,8 @@ PLAIN_NAMES = {
 def explain(decision: dict, signals: dict, s: dict) -> dict:
     if decision["decision"] == "HOLD":
         reasons = [PLAIN_NAMES[k] for k in decision.get("top_signals", [])][:3]
+        if str(decision.get("reason", "")).startswith("red_flag:") and not reasons:
+            reasons = ["this payment method to a new payee is a common scam pattern"]
         if decision.get("reason") == "sensitive_info_shared":
             reasons = ["a Social Security, card or account number was shared on this call"]
         bullet = "\n".join(f"• {r}" for r in reasons) or "• this request matches a common scam pattern"

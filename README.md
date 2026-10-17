@@ -15,7 +15,11 @@ words, and proves it with PRISM.
 | `explain.py` | **Step 3.** The calm message for Grandma (a template, no AI) | Maybe the wording |
 | `pipeline.py` | Runs steps 1→2→3 and sends the trace. You can run it from the terminal | No |
 | `api.py` | The web API the Ninoo app calls (endpoints below) | No |
-| `sample_scenarios.jsonl` | 6 test calls. The PM's `scenarios.jsonl` replaces it | No |
+| `sample_scenarios.jsonl` | 6 quick test calls, for testing changes cheaply | No |
+| `scenarios.jsonl` | 50 draft simulated calls (25 scams, 25 real), with tricky cases tagged `hard_` | PM reviews |
+| `run_eval.py` | Runs all scenarios, writes `results.json` (catch rate, false-block rate) | No |
+| `prism_check.py` | Checks the PRISM key and live connection | No |
+| `render.yaml` | One-click deploy config for Render.com | No |
 
 How one request flows:
 
@@ -39,7 +43,8 @@ transcript ──► PRISM PII guardrail ──blocked──► HOLD (no AI call
 | `POST /analyze` | Send a call + payment. Returns `decision` (HOLD/ALLOW), `status`, `evidence` (quotes from the call, each checked against the transcript), `explanation`, `risk_score` |
 | `POST /verify` | The trusted contact answers: `{"trace_id": "...", "approved": true}` → RELEASED, `false` → CANCELLED |
 | `GET /holds` | All held payments and their status |
-| `GET /scorecard` | Dev 2's `results.json` |
+| `GET /scorecard` | `results.json` from `run_eval.py`: per version and model |
+| `GET /scenarios` | Simulated demo calls (`demo` = 6 good ones for buttons, `all` = everything) |
 | `GET /health` | Shows whether the AI and PRISM are connected |
 
 Demo flow: scam call → `/analyze` returns HOLD with quotes → Sarah taps "Not real" → `/verify` → CANCELLED.

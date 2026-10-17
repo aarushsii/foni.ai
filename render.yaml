@@ -1,0 +1,24 @@
+# Render.com deploy: New -> Blueprint -> pick this repo. Then add the secret keys in the dashboard.
+services:
+  - type: web
+    name: holdup-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: PRISMTRACE_HOST
+        value: https://api.prism.blockconvey.com
+      - key: HOLDUP_MODEL
+        value: nicrron/auto
+      - key: HOLDUP_VERSION
+        value: v1
+      - key: NICRRON_API_KEY
+        sync: false
+      - key: PRISMTRACE_API_KEY
+        sync: false
+      - key: PRISMTRACE_PROJECT_ID
+        sync: false

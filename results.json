@@ -1,0 +1,51 @@
+{
+  "runs": [
+    {
+      "version": "v1",
+      "model": "nicrron/auto",
+      "time": "2026-10-17T18:25:32+00:00",
+      "simulated": true,
+      "scenarios": 50,
+      "scams": 25,
+      "legit": 25,
+      "caught": 21,
+      "missed": 4,
+      "false_blocks": 0,
+      "catch_rate": 84.0,
+      "false_block_rate": 0.0,
+      "accuracy": 92.0,
+      "prism_blocks": 21,
+      "unverified_quotes": 22,
+      "missed_scams": [
+        "c09",
+        "c12",
+        "c17",
+        "c18"
+      ],
+      "false_blocked": [],
+      "errors": []
+    },
+    {
+      "version": "v2",
+      "model": "nicrron/auto",
+      "time": "2026-10-17T18:41:01+00:00",
+      "simulated": true,
+      "scenarios": 50,
+      "scams": 25,
+      "legit": 25,
+      "caught": 25,
+      "missed": 0,
+      "false_blocks": 0,
+      "catch_rate": 100.0,
+      "false_block_rate": 0.0,
+      "accuracy": 100.0,
+      "prism_blocks": 25,
+      "unverified_quotes": 7,
+      "missed_scams": [],
+      "false_blocked": [],
+      "errors": []
+    }
+  ],
+  "updated": "2026-10-17T18:41:01+00:00",
+  "note": "Measured on simulated calls and payments. Not a substitute for fraud protection."
+}

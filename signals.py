@@ -31,11 +31,16 @@ Reply with ONLY this JSON, no other text:
 # Example fix below targets scams that have NO secrecy cue.
 PROMPT_V2 = PROMPT_V1 + """
 
-Important lessons from past mistakes:
-- Many scams have no secrecy cue. Score impersonation high when ANY authority (bank, police,
-  IRS, Medicare, tech support, a lawyer, a doctor) asks for money or personal information.
-- A caller saying "I'm calling from your bank's fraud team" and asking to move money is impersonation.
-- Real banks, police and government never ask for gift cards, crypto, or to move money to a "safe account"."""
+Important lessons from v1 mistakes. Many scams are CALM: no rushing, no secrecy, no emergency.
+- Score impersonation high (0.8+) when ANY official (bank, police, IRS, Medicare, Social Security,
+  tech support, a lawyer, a hospital) asks for money, a fee, or to move money to a new account,
+  even if they sound polite and professional.
+- Score impersonation high when a "relative" says they have a new or borrowed phone, or asks
+  you to pay a friend or roommate instead of themselves.
+- Score unusual_payment high (0.8+) when you must PAY to receive something (a prize, refund,
+  benefit, or new card): that is an advance-fee scam. Also for paying a stranger via a payment app.
+- Real banks, police and government never ask for gift cards, crypto, fees by phone, or to
+  move money to a "safe" or "new" account."""
 
 
 def _client():
@@ -105,7 +110,7 @@ def _keyword_fallback(text: str) -> dict:
     })
 
 
-def analyze(transcript: str, details: str, model: str, version: str) -> tuple[dict, dict]:
+def analyze(transcript: str, details: str, model: str, version: str) -> tuple:
     """Returns (signals, usage). `transcript` must already be redacted."""
     if not config.USE_LLM:
         return _keyword_fallback(transcript), {"model": "offline-keywords", "tokens_in": 0, "tokens_out": 0}

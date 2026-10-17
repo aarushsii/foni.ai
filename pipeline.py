@@ -6,6 +6,7 @@ Try it:
     python pipeline.py --file sample_scenarios.jsonl --version v2 --model openai/gpt-5.5
 """
 import argparse
+from typing import Optional
 import json
 import time
 import uuid
@@ -18,12 +19,13 @@ from decide import decide, apply_payment_facts
 from explain import explain
 
 
-def run(s: dict, model: str | None = None, version: str | None = None) -> dict:
+def run(s: dict, model: Optional[str] = None, version: Optional[str] = None) -> dict:
     model = model or config.DEFAULT_MODEL
     version = version or config.VERSION
     sid = s.get("id", "adhoc")
-    trace_id = f"{sid}-{version}-{uuid.uuid4().hex[:8]}"
-    session_id = f"{sid}-{version}"
+    run_id = uuid.uuid4().hex[:8]
+    trace_id = f"{sid}-{version}-{run_id}"          # the DECISION trace (used by the guardrail)
+    session_id = f"run-{sid}-{version}-{run_id}"    # one session per run -> PRISM builds a trajectory
     start = time.time()
 
     raw = s.get("transcript", "")
@@ -41,24 +43,37 @@ def run(s: dict, model: str | None = None, version: str | None = None) -> dict:
         usage = {"model": model, "tokens_in": 0, "tokens_out": 0}
     else:
         # 1. signals (the only AI call) -> 2. decide (+ PRISM payment-hold guardrail)
+        t0 = time.time()
         signals, usage = analyze(safe_transcript, details, model, version)
         signals = verify_quotes(signals, safe_transcript)   # before payment facts add non-quote evidence
+
+        # Trace 1 of 2 (same session): the AI signal step. Its own trace_id, so the
+        # block check on the decision trace below is not affected.
+        prism.send_trace(
+            trace_id=f"{trace_id}-signals", session_id=session_id, model=usage["model"],
+            user_text=trace_input,
+            output=json.dumps({k: {"score": v["score"], "quote": v["evidence"],
+                                   "quote_verified": v["quote_verified"]} for k, v in signals.items()}),
+            latency_ms=(time.time() - t0) * 1000,
+            metadata={"step": "signals", "version": version, "scenario_id": sid,
+                      "tokens_in": usage["tokens_in"], "tokens_out": usage["tokens_out"]},
+        )
         signals = apply_payment_facts(signals, s)
-        d = decide(signals, s, trace_id)
+        d = decide(signals, s, trace_id, version)
 
     # 3. explanation
     e = explain(d, signals, s)
     latency = (time.time() - start) * 1000
     blocked = bool(d.get("guardrail", {}).get("blocked"))
 
-    # 4. trace. Blocked -> EMPTY output, so PRISM's block check says "Honoured".
+    # Trace 2 of 2: the decision. Blocked -> EMPTY output, so PRISM's block check says "Honoured".
     prism.send_trace(
         trace_id=trace_id, session_id=session_id, model=usage["model"],
         user_text=trace_input,
         output="" if blocked else f"DECISION: {d['decision']} (risk {d['risk_score']})\n{e['explanation']}",
         latency_ms=latency,
         metadata={
-            "version": version, "scenario_id": sid, "decision": d["decision"],
+            "step": "decision", "version": version, "scenario_id": sid, "decision": d["decision"],
             "risk_score": d["risk_score"], "reason": d["reason"],
             "expected": s.get("expected"),  # from scenarios file, for Dev 2's evaluator
             "correct": (s.get("expected") == d["decision"]) if s.get("expected") else None,

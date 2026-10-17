@@ -10,8 +10,8 @@ NICRRON_BASE_URL = "https://api.nicrron.ai/v1"
 DEFAULT_MODEL = os.getenv("HOLDUP_MODEL", "nicrron/auto")
 
 # --- PRISM (tracing + guardrails) ---
-PRISM_HOST = os.getenv("PRISMTRACE_HOST", "https://prism.blockconvey.com")
-PRISM_GUARDRAIL_HOST = "https://api.prism.blockconvey.com"
+PRISM_HOST = os.getenv("PRISMTRACE_HOST", "https://api.prism.blockconvey.com").rstrip("/")
+PRISM_GUARDRAIL_HOST = PRISM_HOST
 PRISM_PROJECT_ID = os.getenv("PRISMTRACE_PROJECT_ID", "")
 PRISM_API_KEY = os.getenv("PRISMTRACE_API_KEY", "")
 

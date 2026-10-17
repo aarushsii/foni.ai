@@ -38,13 +38,28 @@ def risk_score(signals: dict) -> int:
     return round(100 * sum(WEIGHTS[k] * signals[k]["score"] for k in WEIGHTS))
 
 
-def decide(signals: dict, s: dict, trace_id: str) -> dict:
+def red_flag_combo(signals: dict, s: dict) -> str:
+    """v2 only. Calm scams don't add up to a high score, but some COMBINATIONS are
+    never normal. Returns the name of the combo, or "" if none."""
+    if s.get("known_contact"):
+        return ""
+    if s.get("method") in RISKY_METHODS:
+        return "risky_payment_to_new_payee"          # gift card / wire / crypto / courier to a stranger
+    if signals["impersonation"]["score"] >= 0.5 and signals["unusual_payment"]["score"] >= 0.5:
+        return "impersonation_plus_unusual_payment"  # "official" or "relative" + odd payment
+    return ""
+
+
+def decide(signals: dict, s: dict, trace_id: str, version: str = "v1") -> dict:
     # 1. Legit-emergency path: verified known contact -> minimal friction
     if s.get("known_contact") and s.get("callback_verified"):
         return {"decision": "ALLOW", "risk_score": risk_score(signals),
                 "reason": "verified_known_contact", "guardrail": {"blocked": False, "evaluated": False}}
 
     score = risk_score(signals)
+    combo = red_flag_combo(signals, s) if version == "v2" else ""
+    if combo:
+        score = max(score, config.HOLD_THRESHOLD)    # v2: a red-flag combo always reaches the hold line
     level = "HIGH" if score >= config.HOLD_THRESHOLD else "LOW"
     top = [k for k, v in sorted(signals.items(), key=lambda kv: -kv[1]["score"]) if v["score"] >= 0.5]
 
@@ -57,5 +72,5 @@ def decide(signals: dict, s: dict, trace_id: str) -> dict:
     # before Dev 2 has created the PRISM rule, or if PRISM is down.
     hold = bool(g.get("blocked")) or level == "HIGH"
     return {"decision": "HOLD" if hold else "ALLOW", "risk_score": score,
-            "reason": "risk_above_threshold" if hold else "risk_below_threshold",
+            "reason": (f"red_flag:{combo}" if combo else "risk_above_threshold") if hold else "risk_below_threshold",
             "top_signals": top, "guardrail": g, "guardrail_request": request}
