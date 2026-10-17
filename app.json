@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Foni",
+    "slug": "foni",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#f3f7fc"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.foni.trustdemo"
+    },
+    "android": {
+      "package": "com.foni.trustdemo",
+      "adaptiveIcon": {
+        "backgroundColor": "#dcecff"
+      }
+    }
+  }
+}
