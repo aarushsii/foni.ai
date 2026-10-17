@@ -1,4 +1,4 @@
-# HoldUp — Dev 1 guide (agent + backend)
+# Phony — Dev 1 guide (agent + backend)
 
 HoldUp pauses a payment when a phone call looks like a scam, explains why in plain
 words, and proves it with PRISM.
