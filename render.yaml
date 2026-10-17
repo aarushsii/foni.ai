@@ -1,7 +1,7 @@
 # Render.com deploy: New -> Blueprint -> pick this repo. Then add the secret keys in the dashboard.
 services:
   - type: web
-    name: holdup-api
+    name: fony-api
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
@@ -12,10 +12,10 @@ services:
         value: "3.11.9"
       - key: PRISMTRACE_HOST
         value: https://api.prism.blockconvey.com
-      - key: HOLDUP_MODEL
+      - key: FONY_MODEL
         value: nicrron/auto
-      - key: HOLDUP_VERSION
-        value: v1
+      - key: FONY_VERSION
+        value: v2
       - key: NICRRON_API_KEY
         sync: false
       - key: PRISMTRACE_API_KEY

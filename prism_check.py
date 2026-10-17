@@ -25,7 +25,7 @@ else:
 d = requests.get(f"{config.PRISM_HOST}/api/setup-doctor", headers=H, timeout=15,
                  params={"project_id": config.PRISM_PROJECT_ID}).json()
 if d.get("live_connected"):
-    print("LIVE CONNECTED: PRISM is receiving live traces from HoldUp.")
+    print("LIVE CONNECTED: PRISM is receiving live traces from Fony.")
 else:
     print(f"WAITING FOR LIVE: blocked at '{d.get('blocked_step')}'. "
           "Run `python pipeline.py` once, then run this check again.")

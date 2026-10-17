@@ -1,6 +1,6 @@
 # Notes for coding agents working in this repo
 
-HoldUp: a hold-and-verify layer for scam-call payments. Python, FastAPI.
+Fony: a hold-and-verify layer for scam-call payments. Python, FastAPI.
 Model calls go through the Nicrron API (OpenAI-compatible). See README.md.
 
 ## PRISM tracing (do not remove)

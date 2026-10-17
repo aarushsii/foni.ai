@@ -1,6 +1,6 @@
-# Phony — Dev 1 guide (agent + backend)
+# Fony — Dev 1 guide (agent + backend)
 
-HoldUp pauses a payment when a phone call looks like a scam, explains why in plain
+Fony pauses a payment when a phone call looks like a scam, explains why in plain
 words, and proves it with PRISM.
 
 ## What each file does
@@ -61,7 +61,7 @@ are counted in the trace as `metadata.quotes_unverified` (Dev 2 can use this in 
 ### 1. Put the files in your repo
 ```bash
 cd ~/fintea
-unzip ~/Downloads/holdup.zip
+unzip ~/Downloads/fony.zip
 ```
 
 ### 2. Install
@@ -96,7 +96,7 @@ Open http://localhost:8000/docs, click `/analyze` → Try it out → Execute.
 ### 6. Push to GitHub
 ```bash
 git add .
-git commit -m "HoldUp pipeline and API"
+git commit -m "Fony pipeline and API"
 git push
 ```
 Check that `.env` is NOT on GitHub.
